@@ -2,10 +2,10 @@ Gem::Specification.new do |spec|
   spec.name          = "lita-claims"
   spec.version       = "0.0.1"
   spec.authors       = ["Hannes Fostie"]
-  spec.email         = ["hannes@openminds.be"]
-  spec.description   = %q{TODO: Add a description}
-  spec.summary       = %q{TODO: Add a summary}
-  spec.homepage      = "TODO: Add a homepage"
+  spec.email         = ["hannes@maloik.co"]
+  spec.description   = %q{A Lita.io plugin to claim 'properties'. Usecases include disabling deployments for environments when they are in use'}
+  spec.summary       = %q{A Lita.io plugin to claim 'properties'}
+  spec.homepage      = "https://github.com/hannesfostie/lita-claims"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
