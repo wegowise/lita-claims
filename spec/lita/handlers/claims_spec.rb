@@ -7,6 +7,9 @@ describe Lita::Handlers::Claims, lita_handler: true do
 
     it { routes_command('who claimed property').to :exists? }
     it { routes_command('who claimed property environment').to :exists? }
+
+    it { routes_command('unclaim property').to :destroy }
+    it { routes_command('unclaim property environment').to :destroy }
   end
 
   describe 'creating claims' do
@@ -56,6 +59,34 @@ describe Lita::Handlers::Claims, lita_handler: true do
     it 'replies that a property has not been claimed with environment' do
       send_command 'who claimed property_x some_env'
       expect(replies.last).to eq('property_x (some_env) has not been claimed.')
+    end
+  end
+
+  describe 'removing your claims' do
+    it 'removes a claim on a property' do
+      Claim.create('property_x', 'Test User')
+      send_command 'unclaim property_x'
+      expect(replies.last).to eq('property_x is no longer claimed.')
+      expect(Claim.exists?('property_x')).to be_false
+    end
+
+    it 'removes a claim on a property for a certain environment' do
+      Claim.create('property_x', 'Test User', 'env')
+      send_command 'unclaim property_x env'
+      expect(replies.last).to eq('property_x (env) is no longer claimed.')
+      expect(Claim.exists?('property_x', 'env')).to be_false
+    end
+
+    it 'returns an error when no such claim exists' do
+      send_command 'unclaim property_x'
+      expect(replies.last).to eq('property_x has not yet been claimed.')
+    end
+
+    it 'returns an error when the claimer is not the person removing a claim' do
+      Claim.create('property_x', 'Not the test user')
+      send_command 'unclaim property_x'
+      expect(replies.last).to eq('property_x is currently claimed by Not the test user. Use the --force flag when you are sure to unclaim the property.')
+      expect(Claim.exists?('property_x')).to be_true
     end
   end
 end

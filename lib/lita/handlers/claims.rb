@@ -14,6 +14,10 @@ module Lita
         "who claimed PROPERTY" => "To see who claimed a property by the name PROPERTY"
       })
 
+      route(/^unclaim\s(#{PROPERTY_OR_ENVIRONMENT.source})(?:\s(#{PROPERTY_OR_ENVIRONMENT.source}))?/i, :destroy, command: true, help: {
+        "unclaim PROPERTY" => "To remove your claim from a property by the name PROPERTY"
+      })
+
       def create(response)
         claimer = response.message.source.user.name
         property, environment = response.matches.first
@@ -37,6 +41,25 @@ module Lita
           reply = "#{property}#{environment_string} is currently claimed by #{claimer}."
         else
           reply = "#{property}#{environment_string} has not been claimed."
+        end
+        response.reply(reply)
+      end
+
+      def destroy(response)
+        unclaimer = response.message.source.user.name
+        property, environment = response.matches.first
+        environment ||= 'default'
+        environment_string = " (#{environment})" if environment != 'default'
+        if property && Claim.exists?(property, environment)
+          claimer = Claim.read(property, environment)
+          if claimer == unclaimer
+            Claim.destroy(property, environment)
+            reply = "#{property}#{environment_string} is no longer claimed."
+          else
+            reply = "#{property}#{environment_string} is currently claimed by #{claimer}. Use the --force flag when you are sure to unclaim the property."
+          end
+        else
+          reply = "#{property}#{environment_string} has not yet been claimed."
         end
         response.reply(reply)
       end
