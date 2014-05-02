@@ -19,7 +19,7 @@ module Lita
       })
 
       route(/^force\sunclaim\s(#{PROPERTY_OR_ENVIRONMENT.source})(?:\s(#{PROPERTY_OR_ENVIRONMENT.source}))?/i, :force_destroy, command: true, help: {
-        "unclaim PROPERTY" => "To remove your claim from a property by the name PROPERTY"
+        "force unclaim PROPERTY" => "To remove a claim by someone else from a property by the name PROPERTY"
       })
 
       def create(response)
