@@ -12,7 +12,8 @@ describe Lita::Handlers::Claims, lita_handler: true do
     it { routes_command('unclaim property environment').to :destroy }
     it { routes_command('force unclaim property environment').to :force_destroy }
 
-    it { routes_http(:get, '/greet_browser').to(:greet) }
+    it { routes_http(:get, '/available/property_x/someone/staging').to(:available) }
+    it { routes_http(:get, '/available/property_x/someone').to(:available) }
   end
 
   describe 'creating claims' do

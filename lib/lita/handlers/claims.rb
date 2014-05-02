@@ -22,6 +22,29 @@ module Lita
         "force unclaim PROPERTY" => "To remove a claim by someone else from a property by the name PROPERTY"
       })
 
+      http.get "/available/:property/:requester(/:environment)", :available
+
+      def available(request, response)
+        property = request.env['router.params'][:property]
+        environment = request.env['router.params'][:environment]
+        environment_string = " (#{environment})" if environment
+        requester = request.env['router.params'][:requester]
+        claimer = Claim.read(property, environment)
+        if Claim.exists?(property, environment) && claimer != requester
+          # forbidden
+          response.status = 403
+          response.headers["Content-Type"] = "application/json"
+          response.body = {claimer: claimer}
+          target = Source.new(room: '#devs')
+          robot.send_message(target, "#{requester} tried deploying #{property}#{environment_string} but it has been claimed by #{claimer}.")
+        else
+          # OK
+          response.status = 200
+          response.headers["Content-Type"] = "application/json"
+          response.body = {}
+        end
+      end
+
       def create(response)
         claimer = response.message.source.user.name
         property, environment = response.matches.first
