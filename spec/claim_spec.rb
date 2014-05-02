@@ -47,11 +47,11 @@ describe Claim, lita: true do
 
   describe '#exists?' do
     it 'returns true if the property exists' do
-      expect(subject.exists?('property', 'staging')).to be_true
+      expect(subject.exists?('property', 'staging')).to be true
     end
 
     it 'returns false if the property does not exist' do
-      expect(subject.exists?('property_does_not_exist')).to be_false
+      expect(subject.exists?('property_does_not_exist')).to be false
     end
   end
 end
