@@ -18,6 +18,10 @@ module Lita
         "unclaim PROPERTY" => "To remove your claim from a property by the name PROPERTY"
       })
 
+      route(/^force\sunclaim\s(#{PROPERTY_OR_ENVIRONMENT.source})(?:\s(#{PROPERTY_OR_ENVIRONMENT.source}))?/i, :force_destroy, command: true, help: {
+        "unclaim PROPERTY" => "To remove your claim from a property by the name PROPERTY"
+      })
+
       def create(response)
         claimer = response.message.source.user.name
         property, environment = response.matches.first
@@ -56,8 +60,21 @@ module Lita
             Claim.destroy(property, environment)
             reply = "#{property}#{environment_string} is no longer claimed."
           else
-            reply = "#{property}#{environment_string} is currently claimed by #{claimer}. Use the --force flag when you are sure to unclaim the property."
+            reply = "#{property}#{environment_string} is currently claimed by #{claimer}. Use the `force unclaim` command when you are sure to unclaim the property."
           end
+        else
+          reply = "#{property}#{environment_string} has not yet been claimed."
+        end
+        response.reply(reply)
+      end
+
+      def force_destroy(response)
+        property, environment = response.matches.first
+        environment ||= 'default'
+        environment_string = " (#{environment})" if environment != 'default'
+        if property && Claim.exists?(property, environment)
+          Claim.destroy(property, environment)
+          reply = "#{property}#{environment_string} is no longer claimed."
         else
           reply = "#{property}#{environment_string} has not yet been claimed."
         end

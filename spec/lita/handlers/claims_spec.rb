@@ -10,6 +10,7 @@ describe Lita::Handlers::Claims, lita_handler: true do
 
     it { routes_command('unclaim property').to :destroy }
     it { routes_command('unclaim property environment').to :destroy }
+    it { routes_command('force unclaim property environment').to :force_destroy }
   end
 
   describe 'creating claims' do
@@ -85,8 +86,38 @@ describe Lita::Handlers::Claims, lita_handler: true do
     it 'returns an error when the claimer is not the person removing a claim' do
       Claim.create('property_x', 'Not the test user')
       send_command 'unclaim property_x'
-      expect(replies.last).to eq('property_x is currently claimed by Not the test user. Use the --force flag when you are sure to unclaim the property.')
+      expect(replies.last).to eq('property_x is currently claimed by Not the test user. Use the `force unclaim` command when you are sure to unclaim the property.')
       expect(Claim.exists?('property_x')).to be_true
+    end
+  end
+
+  describe 'forcing claim removal' do
+    it 'removes your own claim on a property' do
+      Claim.create('property_x', 'Test User')
+      send_command 'force unclaim property_x'
+      expect(replies.last).to eq('property_x is no longer claimed.')
+      expect(Claim.exists?('property_x')).to be_false
+    end
+
+    it 'removes your own claim on a property for a certain environment' do
+      Claim.create('property_x', 'Test User', 'env')
+      send_command 'force unclaim property_x env'
+      expect(replies.last).to eq('property_x (env) is no longer claimed.')
+      expect(Claim.exists?('property_x', 'env')).to be_false
+    end
+
+    it "removes another person's claim on a property'"do
+      Claim.create('property_x', 'Another User')
+      send_command 'force unclaim property_x'
+      expect(replies.last).to eq('property_x is no longer claimed.')
+      expect(Claim.exists?('property_x')).to be_false
+    end
+
+    it "removes another person's claim on a property for a certain environment" do
+      Claim.create('property_x', 'Another User', 'env')
+      send_command 'force unclaim property_x env'
+      expect(replies.last).to eq('property_x (env) is no longer claimed.')
+      expect(Claim.exists?('property_x', 'env')).to be_false
     end
   end
 end
