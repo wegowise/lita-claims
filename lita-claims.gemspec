@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = "lita-claims"
-  spec.version       = "0.0.3"
+  spec.version       = "0.0.4rc1"
   spec.authors       = ["Hannes Fostie"]
   spec.email         = ["hannes@maloik.co"]
   spec.description   = %q{A Lita.io plugin to claim 'properties'. Usecases include disabling deployments for environments when they are in use'}
